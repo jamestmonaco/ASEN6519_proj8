@@ -8,6 +8,7 @@ Created on Tue Apr 26 08:27:32 2022
 #%% import necessary modules
 import numpy as np
 import datetime
+import pycircstat
 import scipy.io as sci
 import matplotlib.pyplot as plt
 
@@ -121,6 +122,7 @@ def FresnelZone(freq, e, h, theta):
 
 
 #%% Part 2) Coherence detection using reflected signal SNR and carrier phase
+### NOTE: From the console, do : `pip install pycircstat`
 
 
 #%% Part 3) Altimetry retrieval for a coherent-reflection segment of [150, 300] seconds from the start of the dataset
