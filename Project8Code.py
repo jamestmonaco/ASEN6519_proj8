@@ -85,8 +85,8 @@ def FresnelZone(freq, e, h, theta):
         %              a is the semi-major axis, aligned with the satellite azimuth 
         %              b is the semi-minor axis
         %              R locates the center of the ellispe 
-        %                   on the satellite azimuth direction (theta)
-        %                   and R meters away from the base of the Antenna.
+        %                on the satellite azimuth direction (theta)
+        %                and R meters away from the base of the Antenna.
         %     
         %     The ellipse is located on a flat horizontal surface h meters below
         %     the receiver.                  
@@ -96,7 +96,7 @@ def FresnelZone(freq, e, h, theta):
     FREQ = np.array([1575.42e6, 1227.6e6, 0, 0, 1176.45e6])   # GPS frequencies, Hz
                                                               # [ L1 L2  0 0 L5]
     CYCLE = CLIGHT/FREQ                                       # wavelength per cycle (m/cycle)
-    RAD2M = CYCLE/2/pi                                        # (m)
+    RAD2M = CYCLE/2/np.pi                                        # (m)
         
     # ------------------
     # delta = locus of points corresponding to a fixed delay;
@@ -107,15 +107,17 @@ def FresnelZone(freq, e, h, theta):
     
     # semi-major and semi-minor dimension
     # from the appendix of Larson and Nievinski, 2013
-    sin_elev = np.degrees(np.sind(np.radians(e)))
+    sin_elev = np.sin(np.radians(e))
     d = delta 
-    B = np.sqrt( (2 * d * h / sin_elev) + (d / sin_elev)^2 )  # [meters]
+    B = np.sqrt( (2 * d * h / sin_elev) + (d / sin_elev)**2 )  # [meters]
     A = B / sin_elev                                       # [meters]
     
     # determine distance to ellipse center 
-    center = (h + delta/np.degrees(np.sind(np.radians(e))))/np.degrees(np.tand(np.radians(e)))   	# [meters]
+    center = (h + delta/np.sin(np.radians(e)))/np.tan(np.radians(e))   	# [meters]
     
     return [A,B,center]
+
+# Need to calculate the height of the reflector to get signal height above it
 
 
 #%% Part 2) Coherence detection using reflected signal SNR and carrier phase
