@@ -11,27 +11,27 @@ import datetime
 import pycircstat
 import scipy.io as sci
 import matplotlib.pyplot as plt
+from utilities.gpsl1ca import L1CA_CODE_RATE, L1CA_CODE_LENGTH, L1CA_CARRIER_FREQ
 
-#%% Loading in the data
+#%% Loading in the data and collecting ALL the variables from it
+
 data = sci.loadmat("Assignment_8_data.mat")
 
-# And collecting ALL the variables from it
-# OL tracking SNR (direct & reflected, L1 & L2) / V/V
+# OL tracking SNR (direct & reflected, L1 & L2) (V/V)
 OL_L1_d_snr = data['OL_L1_d_snr'][:,0]
 OL_L1_r_snr = data['OL_L1_r_snr'][:,0]
-
 OL_L2_d_snr = data['OL_L2_d_snr'][:,0]
 OL_L2_r_snr = data['OL_L2_r_snr'][:,0]
-# OL tracking reference carrier phase # m
+
+# OL tracking reference carrier phase (m)
 OL_phi_ref_L1_d = data['OL_phi_ref_L1_d'][:,0]
 OL_phi_ref_L1_r = data['OL_phi_ref_L1_r'][:,0]
-
 OL_phi_ref_L2_d = data['OL_phi_ref_L2_d'][:,0]
 OL_phi_ref_L2_r = data['OL_phi_ref_L2_r'][:,0]
-# OL tracking excess phase measurement / rad
+
+# OL tracking excess phase measurement (rad)
 OL_phi_res_L1_d = data['OL_phi_res_L1_d'][:,0]
 OL_phi_res_L1_r = data['OL_phi_res_L1_r'][:,0]
-
 OL_phi_res_L2_d = data['OL_phi_res_L2_d'][:,0]
 OL_phi_res_L2_r = data['OL_phi_res_L2_r'][:,0]
 
@@ -39,28 +39,34 @@ OL_phi_res_L2_r = data['OL_phi_res_L2_r'][:,0]
 Rx_X = data['Rx_X'][:,0] # m
 Rx_Y = data['Rx_Y'][:,0] # m
 Rx_Z = data['Rx_Z'][:,0] # m
-Rx_clk_bias = data['Rx_clk_bias'][:,0] # Receiver clock bias / s
-Rx_timestamp = data['Rx_timestamp'][:,0] # Receiver timestamps with clock bias / s
-# GPS satellite clock bias at the direct & reflected signal transmission and relativistic corrections / s
+
+Rx_clk_bias = data['Rx_clk_bias'][:,0]      # Receiver clock bias (s)
+Rx_timestamp = data['Rx_timestamp'][:,0]    # Receiver timestamps with clock bias (s)
+
+# GPS satellite clock bias at the direct & reflected signal transmission and relativistic corrections (s)
 gps_clk_bias_d = data['gps_clk_bias_d'][:,0]
 gps_clk_bias_r = data['gps_clk_bias_r'][:,0]
 gps_relsv_d = data['gps_relsv_d'][:,0]
 gps_relsv_r = data['gps_relsv_r'][:,0]
-# GPS satellite ECEF coordinates at the direct & reflected signal transmission / m
+
+# GPS satellite ECEF coordinates at the direct & reflected signal transmission (m)
 gps_pos_d = data['gps_pos_d'][:,0]
 gps_pos_r = data['gps_pos_r'][:,0]
-# Transmission time of direct and reflected signal measurement  / s
+
+# Transmission time of direct and reflected signal measurement  (s)
 gps_time_d = data['gps_time_d'][:,0]
 gps_time_r = data['gps_time_r'][:,0]
 gps_wk = data['gps_wk'] # GPS week
+
 # Elevation, azimuth angles from SP to GPS
 sp_az = data['sp_az'][:,0] # deg
 sp_el = data['sp_el'][:,0] # deg
+
 # Geographic coordinates of the SP track
 sp_lat = data['sp_lat'][:,0] # deg
 sp_lon = data['sp_lon'][:,0] # deg
-sp_mss = data['sp_mss'][:,0] # Surface height of the SP track from DTU18 MSS / m
-sp_pos = data['sp_pos'][:,0] # ECEF coordinates of the SP track / m
+sp_mss = data['sp_mss'][:,0] # Surface height of the SP track from DTU18 MSS (m)
+sp_pos = data['sp_pos'][:,0] # ECEF coordinates of the SP track (m)
 sp_tideModel = data['sp_tideModel'][:,0]
 
 #%% Part 1) Calculate the size of the first Fresnel zone for the first and last epoch of signal reflection
@@ -119,7 +125,11 @@ def FresnelZone(freq, e, h, theta):
     return [A,B,center]
 
 # Need to calculate the height of the reflector to get signal height above it
+# calculate antenna height by converting the antenna's ECEF position to range wrt SP ECEF position. 
+# The reflection is specular, so elevation of GPS wrt SP == elevation of antenna wrt SP
+# with range and elevation, height can be calculated. 
 
+for i in 
 
 #%% Part 2) Coherence detection using reflected signal SNR and carrier phase
 ### NOTE: From the console, do : `pip install pycircstat`
