@@ -48,6 +48,7 @@ Rx_Z = data['Rx_Z'][:,0] # m
 
 Rx_clk_bias = data['Rx_clk_bias'][:,0]      # Receiver clock bias (s)
 Rx_timestamp = data['Rx_timestamp'][:,0]    # Receiver timestamps with clock bias (s)
+Rx_datetime = np.array([datetime.datetime.utcfromtimestamp(Rx_timestamp[t]) for t in range(len(Rx_timestamp))])
 
 # GPS satellite clock bias at the direct & reflected signal transmission and relativistic corrections (s)
 gps_clk_bias_d = data['gps_clk_bias_d'][0,:]
@@ -261,13 +262,13 @@ ax4.legend()
 fig.tight_layout()
 
 #%% c. Troposphere Correction
-tropo_delay = 
 
 
 #%% d. Check cycle slips and make corrections if needed 
 
 
 #%% e. Ionosphere Correction
-
+Iono_err_L1 = 
+Iono_err_L2 = 
 
 #%% f. Sea surface height anomaly (SSHA) retrieval
