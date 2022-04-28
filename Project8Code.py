@@ -187,26 +187,54 @@ fresnel_L5 = FresnelZone(5, e, rx_h, theta)
 # Signal SNR is given
 
 # setting up for statistical calculation
+def signalStats(res_phase, N=20):
+    '''
+    Parameters
+    ----------
+    res_phase : array
+        residual phase measurement.
+    N : int
+        number of samples to perform stats over for each epoch.
 
-# calculating kurtosis for each epoch
-dphi = np.array( np.deg2rad( np.diff(OL_phi_res_L1_d) ) )
-N = 20 # number of samples to perform stats over for each epoch 
-circ_length = []
-K = []
-for i in range(M-1 - N):    # Simply not doing the last N samples, for simplicity
-    idx = np.arange(i,(N+i),1)  # indices to sum over
-    dphi_i = dphi[idx]          # window of data 
+    Returns
+    -------
+    K: list
+        kurtosis.
+    circ_length: list
+        circular length
+    '''
     
-    # calculating stats
-    circ_length_i = pcs.resultant_vector_length(dphi_i)
-    #K_i = pcs.kurtosis(dphi_i) # this doesn't work for some reason
-    # (alternatively, from the slides)
-    #eta = 1 / N * abs( sum( np.cos(dphi) + np.sin(dphi)) ) 
-    K_i = 1 / N * sum( np.cos( 2 * (dphi_i - abs(dphi_i)) ) )
+    # setting up statistics
+    dphi = np.array( np.deg2rad( np.diff(res_phase) ) )   # the difference in excess phase
+    M = np.size(res_phase)
     
-    # saving the data
-    circ_length.append(circ_length_i)
-    K.append(K_i)
+    circ_length = []
+    K = []
+    for i in range(M-1 - N):        # Simply not doing the last N samples, for simplicity
+        idx = np.arange(i,(N+i),1)  # indices to sum over
+        dphi_i = dphi[idx]          # window of data to do statistics over
+        
+        # calculating stats
+        circ_length_i = pcs.resultant_vector_length(dphi_i)
+        #K_i = pcs.kurtosis(dphi_i) # this doesn't work for some reason
+        # (alternatively, from the slides)
+        #eta = 1 / N * abs( sum( np.cos(dphi) + np.sin(dphi)) ) 
+        K_i = 1 / N * sum( np.cos( 2 * (dphi_i - abs(dphi_i)) ) )
+        
+        # saving the data
+        circ_length.append(circ_length_i)
+        K.append(K_i)
+    
+    return circ_length, K
+
+# calculating the circular statistics for L1, L2, and L5:
+N = 20
+# direct signals
+[circLength_L1_d, K_L1_d] = signalStats(OL_phi_res_L1_d,N)
+[circLength_L2_d, K_L2_d] = signalStats(OL_phi_res_L2_d,N)
+# reflected signals
+[circLength_L1_r, K_L1_r] = signalStats(OL_phi_res_L1_r,N)
+[circLength_L2_r, K_L2_r] = signalStats(OL_phi_res_L2_r,N)
 
 #%% Part 3) Altimetry retrieval for a coherent-reflection segment of [150, 300] seconds from the start of the dataset
 # a. Unwrap the direct and reflected L1 & L2 signal excess phase measurements OL_phi_res_* 
