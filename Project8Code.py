@@ -8,7 +8,7 @@ Created on Tue Apr 26 08:27:32 2022
 #%% import necessary modules
 import numpy as np
 import datetime
-import pycircstat
+import pycircstat as pcs
 import scipy.io as sci
 import matplotlib.pyplot as plt
 from utilities.gpsl1ca import L1CA_CODE_RATE, L1CA_CODE_LENGTH, L1CA_CARRIER_FREQ
@@ -50,17 +50,17 @@ Rx_clk_bias = data['Rx_clk_bias'][:,0]      # Receiver clock bias (s)
 Rx_timestamp = data['Rx_timestamp'][:,0]    # Receiver timestamps with clock bias (s)
 
 # GPS satellite clock bias at the direct & reflected signal transmission and relativistic corrections (s)
-gps_clk_bias_d = data['gps_clk_bias_d'][:,0]
-gps_clk_bias_r = data['gps_clk_bias_r'][:,0]
-gps_relsv_d = data['gps_relsv_d'][:,0]
-gps_relsv_r = data['gps_relsv_r'][:,0]
+gps_clk_bias_d = data['gps_clk_bias_d'][0,:]
+gps_clk_bias_r = data['gps_clk_bias_r'][0,:]
+gps_relsv_d = data['gps_relsv_d'][0,:]
+gps_relsv_r = data['gps_relsv_r'][0,:]
 
 # GPS satellite ECEF coordinates at the direct & reflected signal transmission (m)
-gps_pos_d = data['gps_pos_d'][:,0]
-gps_pos_r = data['gps_pos_r'][:,0]
+gps_pos_d = data['gps_pos_d']
+gps_pos_r = data['gps_pos_r']
 
 # Transmission time of direct and reflected signal measurement  (s)
-gps_time_d = data['gps_time_d'][:,0]
+gps_time_d = data['gps_time_d'][0,:]
 gps_time_r = data['gps_time_r'][:,0]
 gps_wk = data['gps_wk'] # GPS week
 
@@ -74,6 +74,10 @@ sp_lon = data['sp_lon'][0,:] # deg
 sp_mss = data['sp_mss'][0,:] # Surface height of the SP track from DTU18 MSS (m)
 sp_pos = data['sp_pos'] # ECEF coordinates of the SP track (m)
 sp_tideModel = data['sp_tideModel'][:,0]
+
+# other important data
+dt = np.mean(np.diff(Rx_timestamp)) # average timestep (s)
+M = np.size(Rx_timestamp)           # number of total points
 
 #%% Part 1) Calculate the size of the first Fresnel zone for the first and last epoch of signal reflection
 # Writing in Kristine Larson's FresnelZone.m function in Python
@@ -131,7 +135,7 @@ def FresnelZone(freq, e, h, theta):
     return [A,B,center]
 
 def rx_height(pos_sp, pos_rx, el, epochs):
-    '''
+    '''%--------------------------------
     A function to return the reciever height wrt the specular point
 
     Parameters
@@ -153,31 +157,56 @@ def rx_height(pos_sp, pos_rx, el, epochs):
     # cleaning the inputs and isolating the epochs desired
     pos_sp = np.array(pos_sp[:,epochs])
     pos_rx = np.array(pos_rx[:,epochs])
-    el = np.deg2rad(np.array(el[epochs]))
+    el = np.deg2rad(np.array(el[epochs])) # assuming spectral reflection
     
-    # calculating rx height
+    # calculating rx height as the norm between the ECEF rx and sp 
     R = np.linalg.norm([pos_sp - pos_rx], axis=1)[0]
-    print(el)
     h = np.sin(el) * R
     return h
 
 # preparing variables needed to calc. Fresnel zone
 pos_rx = np.array([Rx_X, Rx_Y, Rx_Z,])
 epochs = [0,-1]
-rx_h = rx_height(sp_pos, pos_rx, sp_el, epochs)
+rx_h = rx_height(sp_pos, pos_rx, sp_el, epochs) # should be within LEO altitudes 
 theta = sp_az[epochs]
 e = sp_el[epochs]
 
-# calculating fresnel zone for each carrier
+# calculating fresnel zone for each carrier.
+# Comes out in format: [[a1, a2... ], [b1,b2...], [R1, R2...]] 
 fresnel_L1 = FresnelZone(1, e, rx_h, theta)
 fresnel_L2 = FresnelZone(2, e, rx_h, theta)
 fresnel_L5 = FresnelZone(5, e, rx_h, theta)
 
-
 #%% Part 2) Coherence detection using reflected signal SNR and carrier phase
-### NOTE: From the console, do : `pip install pycircstat`
-len_L1 = pycircstat.resultant_vector_length(OL_L1_r_snr)
-len_L2 = pycircstat.resultant_vector_length(OL_L2_r_snr)
+# NOTE: From the console, do : `pip install pycircstat`
+# Signal SNR: given
+# Circular length and circular kurtosis: lecture 23, slide 7
+# Circularlength can also be calc. via pycircstat: resultant_vector_length 
+# Kurtosis can also be calc via pycircstat: kurtosis
+
+# Signal SNR is given
+
+# setting up for statistical calculation
+
+# calculating kurtosis for each epoch
+dphi = np.array( np.deg2rad( np.diff(OL_phi_res_L1_d) ) )
+N = 20 # number of samples to perform stats over for each epoch 
+circ_length = []
+K = []
+for i in range(M-1 - N):    # Simply not doing the last N samples, for simplicity
+    idx = np.arange(i,(N+i),1)  # indices to sum over
+    dphi_i = dphi[idx]          # window of data 
+    
+    # calculating stats
+    circ_length_i = pcs.resultant_vector_length(dphi_i)
+    #K_i = pcs.kurtosis(dphi_i) # this doesn't work for some reason
+    # (alternatively, from the slides)
+    #eta = 1 / N * abs( sum( np.cos(dphi) + np.sin(dphi)) ) 
+    K_i = 1 / N * sum( np.cos( 2 * (dphi_i - abs(dphi_i)) ) )
+    
+    # saving the data
+    circ_length.append(circ_length_i)
+    K.append(K_i)
 
 #%% Part 3) Altimetry retrieval for a coherent-reflection segment of [150, 300] seconds from the start of the dataset
 # a. Unwrap the direct and reflected L1 & L2 signal excess phase measurements OL_phi_res_* 
