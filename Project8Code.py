@@ -207,13 +207,31 @@ for i in range(M-1 - N):    # Simply not doing the last N samples, for simplicit
     # saving the data
     circ_length.append(circ_length_i)
     K.append(K_i)
-    
+
 #%% Part 3) Altimetry retrieval for a coherent-reflection segment of [150, 300] seconds from the start of the dataset
 # a. Unwrap the direct and reflected L1 & L2 signal excess phase measurements OL_phi_res_* 
+L1_dir_unwrap = np.unwrap(OL_phi_res_L1_d)
+L2_dir_unwrap = np.unwrap(OL_phi_res_L2_d)
 
+L1_ref_unwrap = np.unwrap(OL_phi_res_L1_r)
+L2_ref_unwrap = np.unwrap(OL_phi_res_L2_r)
 
 #%% b. Orbit and clock error corrections
+# Obtain phase-based range 
+L1_range_dir = OL_phi_ref_L1_d + L1_dir_unwrap
+L2_range_dir = OL_phi_ref_L2_d + L2_dir_unwrap
 
+L1_range_ref = OL_phi_ref_L1_r + L1_ref_unwrap
+L2_range_ref = OL_phi_ref_L2_r + L1_ref_unwrap
+
+# Clock bias correction
+L1_range_d_cor = L1_range_dir - (Rx_clk_bias + gps_clk_bias_d)
+L2_range_d_cor = 
+
+L1_range_r_cor = 
+L2_range_r_cor = 
+
+# Plotting original vs excess measurements
 
 #%% c. Troposphere Correction
 
