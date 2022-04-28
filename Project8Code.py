@@ -123,7 +123,8 @@ def FresnelZone(freq, e, h, theta):
 
 #%% Part 2) Coherence detection using reflected signal SNR and carrier phase
 ### NOTE: From the console, do : `pip install pycircstat`
-
+len_L1 = pycircstat.resultant_vector_length(OL_L1_r_snr)
+len_L2 = pycircstat.resultant_vector_length(OL_L2_r_snr)
 
 #%% Part 3) Altimetry retrieval for a coherent-reflection segment of [150, 300] seconds from the start of the dataset
 # a. Unwrap the direct and reflected L1 & L2 signal excess phase measurements OL_phi_res_* 
