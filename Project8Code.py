@@ -237,6 +237,67 @@ N = 20
 [circLength_L1_r, K_L1_r] = signalStats(OL_phi_res_L1_r,N)
 [circLength_L2_r, K_L2_r] = signalStats(OL_phi_res_L2_r,N)
 
+# Plotting:
+fig, ((ax1,ax2,ax3),(ax4,ax5,ax6)) = plt.subplots(2,3,figsize=(20,10))
+plt.suptitle("Entire Dataset")
+
+ax1.set_title("Direct Signal SNR")
+ax1.plot(OL_L1_d_snr,c='dodgerblue',label='L1')
+ax1.plot(OL_L2_d_snr,c='tomato',label='L2')
+ax1.set_xticks(np.linspace(0,len(OL_L1_d_snr),6),np.linspace(0,360,6).astype(int))
+ax1.set_xlabel("Time (s)")
+ax1.set_ylabel("SNR (V/V)")
+ax1.legend()
+ax1.grid()
+
+ax2.set_title("Direct Signal Circular Length")
+ax2.plot(circLength_L1_d,c='dodgerblue',label='L1')
+ax2.plot(circLength_L2_d,c='tomato',label='L2')
+ax2.set_xticks(np.linspace(0,len(circLength_L1_d),6),np.linspace(0,360,6).astype(int))
+ax2.set_xlabel("Time (s)")
+ax2.set_ylabel("Circular Length (m)")
+ax2.legend()
+ax2.grid()
+
+ax3.set_title("Direct Signal Circular Kurtosis")
+ax3.plot(K_L1_d,c='dodgerblue',label='L1')
+ax3.plot(K_L2_d,c='tomato',label='L2')
+ax3.set_xticks(np.linspace(0,len(circLength_L1_d),6),np.linspace(0,360,6).astype(int))
+ax3.set_xlabel("Time (s)")
+ax3.set_ylabel("Circular Kurtosis")
+ax3.legend()
+ax3.grid()
+
+ax4.set_title("Reflect Signal SNR")
+ax4.plot(OL_L1_r_snr,c='dodgerblue',label='L1')
+ax4.plot(OL_L2_r_snr,c='tomato',label='L2')
+ax4.set_xticks(np.linspace(0,len(OL_L1_r_snr),6),np.linspace(0,360,6).astype(int))
+ax4.set_xlabel("Time (s)")
+ax4.set_ylabel("SNR (V/V)")
+ax4.legend()
+ax4.grid()
+
+ax5.set_title("Reflected Signal Circular Length")
+ax5.plot(circLength_L1_r,c='dodgerblue',label='L1')
+ax5.plot(circLength_L2_r,c='tomato',label='L2')
+ax5.set_xticks(np.linspace(0,len(circLength_L1_d),6),np.linspace(0,360,6).astype(int))
+ax5.set_xlabel("Time (s)")
+ax5.set_ylabel("Circular Length (m)")
+ax5.legend()
+ax5.grid()
+
+ax6.set_title("Reflected Signal Circular Kurtosis")
+ax6.plot(K_L1_r,c='dodgerblue',label='L1')
+ax6.plot(K_L2_r,c='tomato',label='L2')
+ax6.set_xticks(np.linspace(0,len(circLength_L1_d),6),np.linspace(0,360,6).astype(int))
+ax6.set_xlabel("Time (s)")
+ax6.set_ylabel("Circular Kurtosis")
+ax6.legend()
+ax6.grid()
+
+fig.tight_layout()
+plt.show()
+
 #%% Part 3) Altimetry retrieval for a coherent-reflection segment of [150, 300] seconds from the start of the dataset
 # a. Unwrap the direct and reflected L1 & L2 signal excess phase measurements OL_phi_res_* 
 
