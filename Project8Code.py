@@ -296,7 +296,5 @@ fig.tight_layout()
 
 
 #%% e. Ionosphere Correction
-Iono_err_L1 = 
-Iono_err_L2 = 
 
 #%% f. Sea surface height anomaly (SSHA) retrieval
