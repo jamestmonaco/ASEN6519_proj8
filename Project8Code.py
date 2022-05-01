@@ -305,6 +305,8 @@ lambda_L1 = c / freqs_all[0]
 lambda_L2 = c / freqs_all[1]
 pi2 = 2 * np.pi
 
+geo_range = np.sqrt((Rx_X - sp_pos[0])**2 + (Rx_Y - sp_pos[1])**2 + (Rx_Z - sp_pos[2])**2)
+
 L1_dir_unwrap = np.unwrap(OL_phi_res_L1_d[7550:15100])*lambda_L1/pi2
 L2_dir_unwrap = np.unwrap(OL_phi_res_L2_d[7550:15100])*lambda_L2/pi2
 
@@ -326,26 +328,32 @@ L2_range_d_cor = L2_range_dir - c*(Rx_clk_bias[7550:15100] + gps_clk_bias_d[7550
 L1_range_r_cor = L1_range_ref - c*(Rx_clk_bias[7550:15100] + gps_clk_bias_r[7550:15100] + gps_relsv_r[7550:15100])
 L2_range_r_cor = L2_range_ref - c*(Rx_clk_bias[7550:15100] + gps_clk_bias_r[7550:15100] + gps_relsv_r[7550:15100])
 
+L1_phase_est_d = L1_range_d_cor - geo_range[7550:15100] - L1_range_d_cor[0] + geo_range[0]
+L2_phase_est_d = L2_range_d_cor - geo_range[7550:15100] - L2_range_d_cor[0] + geo_range[0]
+
+L1_phase_est_r = L1_range_r_cor - geo_range[7550:15100] - L1_range_r_cor[0] + geo_range[0]
+L2_phase_est_r = L2_range_r_cor - geo_range[7550:15100] - L2_range_r_cor[0] + geo_range[0]
+
 # Plotting original vs excess measurements
 fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(2,2,figsize=(15,8))
 ax1.set_title('L1 Direct Signal')
 ax1.plot(OL_phi_res_L1_d[7550:15100]*lambda_L1/pi2,c='red',label='Original Excess Phase')
-ax1.plot(L1_range_d_cor,c='blue',label='Estimated Phase')
+ax1.plot(L1_phase_est_d,c='blue',label='Estimated Phase')
 ax1.legend()
 
 ax2.set_title('L2 Direct Signal')
 ax2.plot(OL_phi_res_L2_d[7550:15100]*lambda_L2/pi2,c='red',label='Original Excess Phase')
-ax2.plot(L2_range_d_cor,c='blue',label='Estimated Phase')
+ax2.plot(L2_phase_est_d,c='blue',label='Estimated Phase')
 ax2.legend()
 
 ax3.set_title('L1 Reflected Signal')
 ax3.plot(OL_phi_res_L1_r[7550:15100]*lambda_L1/pi2,c='red',label='Original Excess Phase')
-ax3.plot(L1_range_d_cor,c='blue',label='Estimated Phase')
+ax3.plot(L1_phase_est_r,c='blue',label='Estimated Phase')
 ax3.legend()
 
 ax4.set_title('L2 Reflected Signal')
 ax4.plot(OL_phi_res_L2_r[7550:15100]*lambda_L2/pi2,c='red',label='Original Excess Phase')
-ax4.plot(L2_range_r_cor,c='blue',label='Estimated Phase')
+ax4.plot(L2_phase_est_r,c='blue',label='Estimated Phase')
 ax4.legend()
 
 fig.tight_layout()
