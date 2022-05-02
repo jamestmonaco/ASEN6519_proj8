@@ -307,6 +307,7 @@ pi2 = 2 * np.pi
 
 geo_range = np.sqrt((Rx_X - sp_pos[0])**2 + (Rx_Y - sp_pos[1])**2 + (Rx_Z - sp_pos[2])**2)
 
+
 L1_dir_unwrap = np.unwrap(OL_phi_res_L1_d[7550:15100])*lambda_L1/pi2
 L2_dir_unwrap = np.unwrap(OL_phi_res_L2_d[7550:15100])*lambda_L2/pi2
 
@@ -359,6 +360,9 @@ ax4.legend()
 fig.tight_layout()
 
 #%% c. Troposphere Correction
+# this uses the MATLAB functions of project 4 to calculate total zeneth delay
+import matlab.engine
+eng = matlab.engine.start_matlab()
 
 
 #%% d. Check cycle slips and make corrections if needed 
