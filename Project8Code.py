@@ -313,6 +313,26 @@ L2_dir_unwrap = np.unwrap(OL_phi_res_L2_d[7550:15100])*lambda_L2/pi2
 L1_ref_unwrap = np.unwrap(OL_phi_res_L1_r[7550:15100])*lambda_L1/pi2
 L2_ref_unwrap = np.unwrap(OL_phi_res_L2_r[7550:15100])*lambda_L2/pi2
 
+# Plotting the unwrapped phase
+fig, (ax1,ax2) = plt.subplots(1,2,figsize=(10,7))
+ax1.set_title("Direct Signal Unwrapped Phase")
+ax1.plot(L1_dir_unwrap,c='dodgerblue',label='L1')
+ax1.plot(L2_dir_unwrap,c='tomato',label='L2')
+ax1.set_xticks(np.linspace(0,len(OL_L1_r_snr),6),np.linspace(150,300,6).astype(int))
+ax1.set_xlabel("Time (s)")
+ax1.set_ylabel("Phase (m)")
+
+ax2.set_title("Reflected Signal Unwrapped Phase")
+ax2.plot(L1_ref_unwrap,c='dodgerblue',label='L1')
+ax2.plot(L2_ref_unwrap,c='tomato',label='L2')
+ax2.set_xticks(np.linspace(0,len(OL_L1_r_snr),6),np.linspace(150,300,6).astype(int))
+ax2.set_xlabel("Time (s)")
+ax2.set_ylabel("Phase (m)")
+
+fig.tight_layout()
+plt.show();
+
+
 #%% b. Orbit and clock error corrections
 # Obtain phase-based range 
 L1_range_dir = OL_phi_ref_L1_d[7550:15100] + L1_dir_unwrap
@@ -322,17 +342,21 @@ L1_range_ref = OL_phi_ref_L1_r[7550:15100] + L1_ref_unwrap
 L2_range_ref = OL_phi_ref_L2_r[7550:15100] + L1_ref_unwrap
 
 # Clock bias correction
-L1_range_d_cor = L1_range_dir - c*(Rx_clk_bias[7550:15100] + gps_clk_bias_d[7550:15100] + gps_relsv_d[7550:15100])
-L2_range_d_cor = L2_range_dir - c*(Rx_clk_bias[7550:15100] + gps_clk_bias_d[7550:15100] + gps_relsv_d[7550:15100])
+L1_range_d_cor = L1_range_dir - c*(Rx_clk_bias[7550:15100] - gps_clk_bias_d[7550:15100] - gps_relsv_d[7550:15100])
+L2_range_d_cor = L2_range_dir - c*(Rx_clk_bias[7550:15100] - gps_clk_bias_d[7550:15100] - gps_relsv_d[7550:15100])
 
-L1_range_r_cor = L1_range_ref - c*(Rx_clk_bias[7550:15100] + gps_clk_bias_r[7550:15100] + gps_relsv_r[7550:15100])
-L2_range_r_cor = L2_range_ref - c*(Rx_clk_bias[7550:15100] + gps_clk_bias_r[7550:15100] + gps_relsv_r[7550:15100])
+L1_range_r_cor = L1_range_ref - c*(Rx_clk_bias[7550:15100] - gps_clk_bias_r[7550:15100] - gps_relsv_r[7550:15100])
+L2_range_r_cor = L2_range_ref - c*(Rx_clk_bias[7550:15100] - gps_clk_bias_r[7550:15100] - gps_relsv_r[7550:15100])
 
-L1_phase_est_d = L1_range_d_cor - geo_range[7550:15100] - L1_range_d_cor[0] + geo_range[0]
-L2_phase_est_d = L2_range_d_cor - geo_range[7550:15100] - L2_range_d_cor[0] + geo_range[0]
+L1_phase_est_d = L1_range_d_cor - geo_range[7550:15100]
+L1_phase_est_d = L1_phase_est_d - L1_phase_est_d[0]
+L2_phase_est_d = L2_range_d_cor - geo_range[7550:15100]
+L2_phase_est_d = L2_phase_est_d - L2_phase_est_d[0]
 
-L1_phase_est_r = L1_range_r_cor - geo_range[7550:15100] - L1_range_r_cor[0] + geo_range[0]
-L2_phase_est_r = L2_range_r_cor - geo_range[7550:15100] - L2_range_r_cor[0] + geo_range[0]
+L1_phase_est_r = L1_range_r_cor - geo_range[7550:15100]
+L1_phase_est_r = L1_phase_est_r - L1_phase_est_r[0]
+L2_phase_est_r = L2_range_r_cor - geo_range[7550:15100]
+L2_phase_est_r = L2_phase_est_r - L2_phase_est_r[0]
 
 # Plotting original vs excess measurements
 fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(2,2,figsize=(15,8))
