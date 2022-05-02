@@ -472,5 +472,3 @@ plt.show()
 
 #%% f. Sea surface height anomaly (SSHA) retrieval
 # subtract the direct signal excess phase from the reflected signal excess phase
-L1_SSHA = 
-L2_SSHA = 
