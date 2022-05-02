@@ -62,7 +62,7 @@ gps_pos_r = data['gps_pos_r']
 
 # Transmission time of direct and reflected signal measurement  (s)
 gps_time_d = data['gps_time_d'][0,:]
-gps_time_r = data['gps_time_r'][:,0]
+gps_time_r = data['gps_time_r'][0,:]
 gps_wk = data['gps_wk'] # GPS week
 
 # Elevation, azimuth angles from SP to GPS
@@ -409,8 +409,18 @@ fig.tight_layout()
 import matlab.engine
 eng = matlab.engine.start_matlab()
 
-#%% d. Check cycle slips and make corrections if needed
+# gps_wk_ = matlab.int32(gps_wk[0][0])
+gps_time_d_ = matlab.double(gps_time_d.tolist())
+sp_lat_ = matlab.double(sp_lat.tolist())
+sp_lon_ = matlab.double(sp_lon.tolist())
+rx_h_ = matlab.double(rx_h.tolist())
+sp_el_ = matlab.double(sp_el.tolist())
+sp_az_ = matlab.double(sp_az.tolist())
 
+[Tropo_Delay_az,dry_mf_vmf,wet_mf_vmf,ZHD,ZWD] = eng.tropo_model(2157,gps_time_d_[0][0],sp_lat_[0][0],sp_lon_[0][0],rx_h_[0][0],sp_el_[0][0],sp_az_[0][0])
+
+
+#%% d. Check cycle slips and make corrections if needed 
 
 #%% e. Ionosphere Correction
 # Calcualte the TEC:

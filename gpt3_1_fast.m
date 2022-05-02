@@ -128,10 +128,10 @@ if (it==1) % then  constant parameters
     sinfy = 0;
     sinhy = 0;
 else 
-    cosfy = cos(doy/365.25*2*pi);   % coefficient for A1
-    coshy = cos(doy/365.25*4*pi);   % coefficient for B1
-    sinfy = sin(doy/365.25*2*pi);   % coefficient for A2
-    sinhy = sin(doy/365.25*4*pi);   % coefficient for B2
+    cosfy = cos(double(doy/365.25*2*pi));   % coefficient for A1
+    coshy = cos(double(doy/365.25*4*pi));   % coefficient for B1
+    sinfy = sin(double(doy/365.25*2*pi));   % coefficient for A2
+    sinhy = sin(double(doy/365.25*4*pi));   % coefficient for B2
 end
 
 % read the respective data from the grid
