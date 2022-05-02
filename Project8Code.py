@@ -316,7 +316,7 @@ L1_ref_unwrap = np.unwrap(OL_phi_res_L1_r[7550:15100])*lambda_L1/pi2
 L2_ref_unwrap = np.unwrap(OL_phi_res_L2_r[7550:15100])*lambda_L2/pi2
 
 # Plotting the unwrapped phase
-fig, (ax1,ax2) = plt.subplots(1,2,figsize=(10,7))
+fig, (ax1,ax2) = plt.subplots(1,2,figsize=(10,5))
 ax1.set_title("Direct Signal Unwrapped Phase")
 ax1.plot(L1_dir_unwrap,c='dodgerblue',label='L1')
 ax1.plot(L2_dir_unwrap,c='tomato',label='L2')
@@ -338,7 +338,6 @@ ax2.grid()
 
 fig.tight_layout()
 plt.show();
-
 
 #%% b. Orbit and clock error corrections
 # Obtain phase-based range 
@@ -423,7 +422,65 @@ sp_az_ = matlab.double(sp_az.tolist())
 
 #%% d. Check cycle slips and make corrections if needed 
 
-
 #%% e. Ionosphere Correction
+# Calcualte the TEC:
+beta = (1/40.3) * (freqs_all[0]**2 * freqs_all[1] **2)/(freqs_all[1]**2 - freqs_all[0]**2)
+STEC_dir = beta * (L1_range_d_cor - L2_range_d_cor) # electrons / m^2
+STEC_ref = beta * (L1_range_r_cor - L2_range_r_cor) # electrons / m^2
+# Use the TEC to calculate the phase advance:
+L1_phase_adv_dir = -(40.3*STEC_dir)/(freqs_all[0]**2)
+L2_phase_adv_dir = -(40.3*STEC_dir)/(freqs_all[1]**2)
+
+L1_phase_adv_ref = -(40.3*STEC_ref)/(freqs_all[0]**2)
+L2_phase_adv_ref = -(40.3*STEC_ref)/(freqs_all[1]**2)
+# Correct the phase values using the phase advance:
+L1_phase_cor_d = ##prior phase estimate## + L1_phase_adv_dir # Note these are added since the arrays are negative
+L2_phase_cor_d = ##prior phase estimate## + L2_phase_adv_dir ##
+
+L1_phase_cor_r = ##prior phase estimate## + L1_phase_adv_ref ###
+L2_phase_cor_r = ##prior phase estimate## + L2_phase_adv_ref ####
+# Make plots of the delay and corrections:
+fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(2,2,figsize=(15,8))
+ax1.set_title("Direct Signal Ionospheric Correction")
+ax1.plot(L1_phase_adv_dir,c='dodgerblue',label='L1')
+ax1.plot(L2_phase_adv_dir,c='tomato',label='L2')
+ax1.set_xticks(np.linspace(0,len(L1_dir_unwrap),6),np.linspace(150,300,6).astype(int))
+ax1.set_xlabel("Time (s)")
+ax1.set_ylabel("Phase Advance (m)")
+ax1.grid()
+ax1.legend()
+
+ax2.set_title("Direct Signal Phase (corrected)")
+ax2.plot(L1_phase_cor_d,c='dodgerblue',label='L1')
+ax2.plot(L2_phase_cor_d,c='tomato',label='L2')
+ax2.set_xticks(np.linspace(0,len(L1_dir_unwrap),6),np.linspace(150,300,6).astype(int))
+ax2.set_xlabel("Time (s)")
+ax2.set_ylabel("Phase Advance (m)")
+ax2.grid()
+ax2.legend()
+
+ax3.set_title("Reflected Signal Ionospheric Correction")
+ax3.plot(L1_phase_adv_ref,c='dodgerblue',label='L1')
+ax3.plot(L2_phase_adv_ref,c='tomato',label='L2')
+ax3.set_xticks(np.linspace(0,len(L1_dir_unwrap),6),np.linspace(150,300,6).astype(int))
+ax3.set_xlabel("Time (s)")
+ax3.set_ylabel("Phase (m)")
+ax3.grid()
+ax3.legend()
+
+ax4.set_title("Reflected Signal Phase (corrected)")
+ax4.plot(L1_phase_cor_r,c='dodgerblue',label='L1')
+ax4.plot(L2_phase_cor_r,c='tomato',label='L2')
+ax4.set_xticks(np.linspace(0,len(L1_dir_unwrap),6),np.linspace(150,300,6).astype(int))
+ax4.set_xlabel("Time (s)")
+ax4.set_ylabel("Phase (m)")
+ax4.grid()
+ax4.legend()
+
+fig.tight_layout()
+plt.show()    
 
 #%% f. Sea surface height anomaly (SSHA) retrieval
+# subtract the direct signal excess phase from the reflected signal excess phase
+L1_SSHA = 
+L2_SSHA = 
