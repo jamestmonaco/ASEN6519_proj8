@@ -409,20 +409,59 @@ fig.tight_layout()
 import matlab.engine
 eng = matlab.engine.start_matlab()
 
-#%% d. Check cycle slips and make corrections if needed 
+#%% d. Check cycle slips and make corrections if needed
 
 
 #%% e. Ionosphere Correction
 # Calcualte the TEC:
 beta = (1/40.3) * (freqs_all[0]**2 * freqs_all[1] **2)/(freqs_all[1]**2 - freqs_all[0]**2)
-STEC_dir = beta * (L1_range_d_cor - L2_range_d_cor) # electrons
-STEC_ref = beta * (L1_range_r_cor - L2_range_r_cor) # electrons
+STEC_dir = beta * (L1_range_d_cor - L2_range_d_cor) # electrons / m^2
+STEC_ref = beta * (L1_range_r_cor - L2_range_r_cor) # electrons / m^2
 # Use the TEC to calculate the phase advance:
-L1_phase_adv_dir = -(40.3*STEC_dir)/(c*freqs_all[0]**2)
-L2_phase_adv_dir = -(40.3*STEC_dir)/(c*freqs_all[1]**2)
+L1_phase_adv_dir = -(40.3*STEC_dir)/(freqs_all[0]**2)
+L2_phase_adv_dir = -(40.3*STEC_dir)/(freqs_all[1]**2)
 
-L1_phase_adv_ref = -(40.3*STEC_ref)/(c*freqs_all[0]**2)
-L2_phase_adv_ref = -(40.3*STEC_ref)/(c*freqs_all[1]**2)
+L1_phase_adv_ref = -(40.3*STEC_ref)/(freqs_all[0]**2)
+L2_phase_adv_ref = -(40.3*STEC_ref)/(freqs_all[1]**2)
 # Correct the phase values using the phase advance:
+
+# Make plots of the delay and corrections:
+fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(2,2,figsize=(15,8))
+ax1.set_title("Direct Signal Ionospheric Correction")
+ax1.plot(L1_phase_adv_dir,c='dodgerblue',label='L1')
+ax1.plot(L2_phase_adv_dir,c='tomato',label='L2')
+ax1.set_xticks(np.linspace(0,len(L1_dir_unwrap),6),np.linspace(150,300,6).astype(int))
+ax1.set_xlabel("Time (s)")
+ax1.set_ylabel("Phase Advance (m)")
+ax1.grid()
+ax1.legend()
+
+ax2.set_title("Direct Signal Phase (corrected)")
+
+ax2.set_xticks(np.linspace(0,len(L1_dir_unwrap),6),np.linspace(150,300,6).astype(int))
+ax2.set_xlabel("Time (s)")
+ax2.set_ylabel("Phase Advance (m)")
+ax2.grid()
+ax2.legend()
+
+ax3.set_title("Reflected Signal Ionospheric Correction")
+ax3.plot(L1_phase_adv_ref,c='dodgerblue',label='L1')
+ax3.plot(L2_phase_adv_ref,c='tomato',label='L2')
+ax3.set_xticks(np.linspace(0,len(L1_dir_unwrap),6),np.linspace(150,300,6).astype(int))
+ax3.set_xlabel("Time (s)")
+ax3.set_ylabel("Phase (m)")
+ax3.grid()
+ax3.legend()
+
+ax4.set_title("Reflected Signal Phase (corrected)")
+
+ax4.set_xticks(np.linspace(0,len(L1_dir_unwrap),6),np.linspace(150,300,6).astype(int))
+ax4.set_xlabel("Time (s)")
+ax4.set_ylabel("Phase (m)")
+ax4.grid()
+ax4.legend()
+
+fig.tight_layout()
+plt.show()    
 
 #%% f. Sea surface height anomaly (SSHA) retrieval
