@@ -339,7 +339,6 @@ ax2.grid()
 fig.tight_layout()
 plt.show();
 
-
 #%% b. Orbit and clock error corrections
 # Obtain phase-based range 
 L1_range_dir = OL_phi_ref_L1_d[7550:15100] + L1_dir_unwrap
@@ -410,10 +409,20 @@ fig.tight_layout()
 import matlab.engine
 eng = matlab.engine.start_matlab()
 
-
 #%% d. Check cycle slips and make corrections if needed 
 
 
 #%% e. Ionosphere Correction
+# Calcualte the TEC:
+beta = (1/40.3) * (freqs_all[0]**2 * freqs_all[1] **2)/(freqs_all[1]**2 - freqs_all[0]**2)
+STEC_dir = beta * (L1_range_d_cor - L2_range_d_cor) # electrons
+STEC_ref = beta * (L1_range_r_cor - L2_range_r_cor) # electrons
+# Use the TEC to calculate the phase advance:
+L1_phase_adv_dir = -(40.3*STEC_dir)/(c*freqs_all[0]**2)
+L2_phase_adv_dir = -(40.3*STEC_dir)/(c*freqs_all[1]**2)
+
+L1_phase_adv_ref = -(40.3*STEC_ref)/(c*freqs_all[0]**2)
+L2_phase_adv_ref = -(40.3*STEC_ref)/(c*freqs_all[1]**2)
+# Correct the phase values using the phase advance:
 
 #%% f. Sea surface height anomaly (SSHA) retrieval
