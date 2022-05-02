@@ -315,7 +315,7 @@ L1_ref_unwrap = np.unwrap(OL_phi_res_L1_r[7550:15100])*lambda_L1/pi2
 L2_ref_unwrap = np.unwrap(OL_phi_res_L2_r[7550:15100])*lambda_L2/pi2
 
 # Plotting the unwrapped phase
-fig, (ax1,ax2) = plt.subplots(1,2,figsize=(10,7))
+fig, (ax1,ax2) = plt.subplots(1,2,figsize=(10,5))
 ax1.set_title("Direct Signal Unwrapped Phase")
 ax1.plot(L1_dir_unwrap,c='dodgerblue',label='L1')
 ax1.plot(L2_dir_unwrap,c='tomato',label='L2')
