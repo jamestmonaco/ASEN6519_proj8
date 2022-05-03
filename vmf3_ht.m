@@ -83,6 +83,7 @@ if leapYear == 1 && month > 2
     doy = doy + 1;
 end
 doy = doy + mjd-floor(mjd);   % add decimal places
+doy = double(doy);
 
 
 % determine the VMF3 coefficients
