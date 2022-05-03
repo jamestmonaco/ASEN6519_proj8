@@ -345,7 +345,7 @@ L1_range_dir = OL_phi_ref_L1_d[7550:15100] + L1_dir_unwrap
 L2_range_dir = OL_phi_ref_L2_d[7550:15100] + L2_dir_unwrap
 
 L1_range_ref = OL_phi_ref_L1_r[7550:15100] + L1_ref_unwrap
-L2_range_ref = OL_phi_ref_L2_r[7550:15100] + L1_ref_unwrap
+L2_range_ref = OL_phi_ref_L2_r[7550:15100] + L2_ref_unwrap
 
 # Clock bias correction
 L1_range_d_cor = L1_range_dir - c*(Rx_clk_bias[7550:15100] - gps_clk_bias_d[7550:15100] - gps_relsv_d[7550:15100])
@@ -446,9 +446,10 @@ plt.show()
 
 #%% d. Check cycle slips and make corrections if needed 
 L1_phase_cyc_r = L1_phase_trop_r
-L1_phase_cyc_r[6200:] += lambda_L1
+L1_phase_cyc_r[6202:] += lambda_L1
+L1_phase_cyc_r[6877:] += lambda_L1/2
 L2_phase_cyc_r = L2_phase_trop_r
-L2_phase_cyc_r[6200:] += lambda_L2
+L2_phase_cyc_r[7047:] -= lambda_L2
 
 L1_phase_trop_r = L1_phase_est_r - 2*tropo_delay
 L2_phase_trop_r = L2_phase_est_r - 2*tropo_delay
@@ -458,24 +459,22 @@ L2_phase_trop_r -= L2_phase_trop_r[0]
 # Plot the comparison:
 fig,(ax1,ax2) = plt.subplots(1,2,figsize=(11,5))
 ax1.set_title("L1 Phase Estimate")
-ax1.plot(L1_phase_trop_r,c='navy',label='Before Correction')
+#ax1.plot(L1_phase_trop_r,c='navy',label='Before Correction')
 ax1.plot(L1_phase_cyc_r,c='dodgerblue',label='After Correction',alpha=0.75)
 ax1.set_xticks(np.linspace(0,len(L1_dir_unwrap),6),np.linspace(150,300,6).astype(int))
 ax1.set_xlabel("Time (s)")
 ax1.set_ylabel("Phase (m)")
 ax1.grid()
 ax1.legend()
-ax1.axvline(6200,c='black',linewidth=1,linestyle=":")
 
 ax2.set_title("L2 Phase Estimate")
-ax2.plot(L2_phase_trop_r,c='chocolate',label='Before Correction')
+#ax2.plot(L2_phase_trop_r,c='chocolate',label='Before Correction')
 ax2.plot(L2_phase_cyc_r,c='tomato',label='After Correction',alpha=0.75)
 ax2.set_xticks(np.linspace(0,len(L1_dir_unwrap),6),np.linspace(150,300,6).astype(int))
 ax2.set_xlabel("Time (s)")
 ax2.set_ylabel("Phase (m)")
 ax2.grid()
 ax2.legend()
-ax2.axvline(6200,c='black',linewidth=1,linestyle=":")
    
 fig.tight_layout()
 plt.show()
@@ -545,17 +544,20 @@ plt.show()
 
 #%% f. Sea surface height anomaly (SSHA) retrieval
 # subtract the direct signal excess phase from the reflected signal excess phase
-L1_phase_adv_dir -= L1_phase_adv_dir[0]
-L2_phase_adv_dir -= L2_phase_adv_dir[0]
+L1_phase_cor_d -= L1_phase_cor_d[0]
+L2_phase_cor_d -= L2_phase_cor_d[0]
 
 L1_phase_cor_r -= L1_phase_cor_r[0]
 L2_phase_cor_r -= L2_phase_cor_r[0]
 
-L1_SSHA = (L1_phase_adv_dir - L1_phase_cor_r) / 2 / np.sin(np.radians(sp_el[7550:15100]))
-L2_SSHA = (L2_phase_adv_dir - L2_phase_cor_r) / 2 / np.sin(np.radians(sp_el[7550:15100]))
+L1_dphi = (L1_phase_adv_dir - L1_phase_cor_r)
+L2_dphi = (L2_phase_adv_dir - L2_phase_cor_r)
 
-L1_SSHA -= np.mean(L1_SSHA)
-L2_SSHA -= np.mean(L2_SSHA)
+L1_dphi -= np.mean(L1_dphi)
+L2_dphi -= np.mean(L2_dphi)
+
+L1_SSHA = L1_dphi / 2 / np.sin(np.radians(sp_el[7550:15100]))
+L2_SSHA = L2_dphi / 2 / np.sin(np.radians(sp_el[7550:15100]))
 
 # Plot the results:
 plt.figure(figsize=(8,5))
