@@ -419,7 +419,6 @@ sp_az_ = matlab.double(sp_az.tolist())
 
 [Tropo_Delay_az,dry_mf_vmf,wet_mf_vmf,ZHD,ZWD] = eng.tropo_model(2157,gps_time_d_[0][0],sp_lat_[0][0],sp_lon_[0][0],rx_h_[0][0],sp_el_[0][0],sp_az_[0][0])
 
-
 #%% d. Check cycle slips and make corrections if needed 
 
 #%% e. Ionosphere Correction
