@@ -452,7 +452,8 @@ L2_phase_cyc_r = L2_phase_trop_r
 
 L1_diffs= np.argsort(abs(np.diff(L1_phase_cyc_r)))
 L2_diffs= np.argsort(abs(np.diff(L2_phase_cyc_r)))
-L2_phase_cyc_r[L2_diffs[-1]:] -= lambda_L1
+
+L2_phase_cyc_r[L2_diffs[-1]:] -= lambda_L2
 
 L1_phase_cyc_r[L1_diffs[-1]:] += lambda_L1
 L1_phase_cyc_r[L1_diffs[-6]:] += lambda_L1 * 1.5
@@ -464,9 +465,6 @@ L1_phase_trop_r = L1_phase_est_r - 2*tropo_delay
 L2_phase_trop_r = L2_phase_est_r - 2*tropo_delay
 L1_phase_trop_r -= L1_phase_trop_r[0]
 L2_phase_trop_r -= L2_phase_trop_r[0]
-
-
-
 
 # Plot the comparison:
 fig,(ax1,ax2) = plt.subplots(1,2,figsize=(11,5))
@@ -494,14 +492,28 @@ plt.show()
 #%% e. Ionosphere Correction
 # Calcualte the TEC:
 beta = (1/40.3) * (freqs_all[0]**2 * freqs_all[1] **2)/(freqs_all[1]**2 - freqs_all[0]**2)
-STEC_dir = beta * (L1_range_d_cor - L2_range_d_cor) # electrons / m^2
-STEC_ref = beta * (L1_range_r_cor - L2_range_r_cor) # electrons / m^2
+
+STEC_dir = (L1_range_d_cor - L2_range_d_cor) # electrons / m^2
+STEC_ref = (L1_range_r_cor - L2_range_r_cor) # electrons / m^2
+
+
+STEC_ref[L2_diffs[-1]:] += lambda_L2
+STEC_ref[L1_diffs[-1]:] += lambda_L1
+STEC_ref[L1_diffs[-6]:] += lambda_L1 * 1.5
+STEC_ref[L1_diffs[-23]-17:] -= lambda_L1 
+STEC_ref[L1_diffs[-23]-110:] += lambda_L1 *2
+STEC_ref[L1_diffs[-3]-200:] += lambda_L1
+
+STEC_dir = beta * STEC_dir     # electrons / m^2
+STEC_ref = beta * STEC_ref     # electrons / m^2
+
 # Use the TEC to calculate the phase advance:
 L1_phase_adv_dir = -(40.3*STEC_dir)/(freqs_all[0]**2)
 L2_phase_adv_dir = -(40.3*STEC_dir)/(freqs_all[1]**2)
 
 L1_phase_adv_ref = -(40.3*STEC_ref)/(freqs_all[0]**2)
 L2_phase_adv_ref = -(40.3*STEC_ref)/(freqs_all[1]**2)
+
 # Correct the phase values using the phase advance:
 L1_phase_cor_d = L1_phase_est_d + L1_phase_adv_dir # Note these are added since the arrays are negative
 L1_phase_cor_d -= L1_phase_cor_d[0]
