@@ -407,8 +407,6 @@ fig.tight_layout()
 #%% c. Troposphere Correction
 # this uses the MATLAB functions of project 4 to calculate total zeneth delay
 
-<<<<<<< HEAD
-=======
 tropo_in_dict = {"GPSweek": gps_wk[0][0], 
                  "GPStime": gps_time_r, 
                  "lat": sp_lat, "long": sp_lon, 
@@ -418,9 +416,66 @@ sci.savemat("tropo_in.mat", tropo_in_dict)
 
 tropo_out = sci.loadmat("tropo_out.mat")
 
->>>>>>> a9fcca48e974f4de0fec0b29a388f6b50a69d16a
-#%% d. Check cycle slips and make corrections if needed 
+# Removing the tropo delay (twice) from the reflected signal:
+tropo_delay = tropo_out['Tropo_Delay_az'][0][7550:15100]
+L1_phase_trop_r = L1_phase_est_r - 2*tropo_delay
+L2_phase_trop_r = L2_phase_est_r - 2*tropo_delay
 
+# Plotting the correction and corrected phase:
+fig, (ax1,ax2) = plt.subplots(1,2,figsize=(11,5))
+ax1.set_title("Troposphere Delay")
+ax1.plot(sp_el[7550:15100],tropo_delay,c='violet',linewidth=2.5)
+ax1.set_xlabel("SP to GPS Elevation (deg)")
+ax1.set_ylabel("Troposphere Delay (m)")
+ax1.grid()
+
+ax2.set_title("Reflected Signal Phase (corrected)")
+ax2.plot(L1_phase_trop_r,c='dodgerblue',label='L1')
+ax2.plot(L2_phase_trop_r,c='tomato',label='L2')
+ax2.set_xticks(np.linspace(0,len(L1_dir_unwrap),6),np.linspace(150,300,6).astype(int))
+ax2.set_xlabel("Time (s)")
+ax2.set_ylabel("Phase (m)")
+ax2.grid()
+ax2.legend()
+ax2.axvline(6200,c='black',linewidth=1)
+
+fig.tight_layout()
+plt.show()
+
+#%% d. Check cycle slips and make corrections if needed 
+L1_phase_cyc_r = L1_phase_trop_r
+L1_phase_cyc_r[6200:] += lambda_L1
+L2_phase_cyc_r = L2_phase_trop_r
+L2_phase_cyc_r[6200:] += lambda_L2
+
+L1_phase_trop_r = L1_phase_est_r - 2*tropo_delay
+L2_phase_trop_r = L2_phase_est_r - 2*tropo_delay
+
+# Plot the comparison:
+fig,(ax1,ax2) = plt.subplots(1,2,figsize=(11,5))
+ax1.set_title("L1 Phase Estimate")
+ax1.plot(L1_phase_trop_r,c='navy',label='Before Correction')
+ax1.plot(L1_phase_cyc_r,c='dodgerblue',label='After Correction',alpha=0.75)
+ax1.set_xticks(np.linspace(0,len(L1_dir_unwrap),6),np.linspace(150,300,6).astype(int))
+ax1.set_xlabel("Time (s)")
+ax1.set_ylabel("Phase (m)")
+ax1.grid()
+ax1.legend()
+ax1.axvline(6200,c='black',linewidth=1,linestyle=":")
+
+ax2.set_title("L2 Phase Estimate")
+ax2.plot(L2_phase_trop_r,c='chocolate',label='Before Correction')
+ax2.plot(L2_phase_cyc_r,c='tomato',label='After Correction',alpha=0.75)
+ax2.set_xticks(np.linspace(0,len(L1_dir_unwrap),6),np.linspace(150,300,6).astype(int))
+ax2.set_xlabel("Time (s)")
+ax2.set_ylabel("Phase (m)")
+ax2.grid()
+ax2.legend()
+ax2.axvline(6200,c='black',linewidth=1,linestyle=":")
+   
+fig.tight_layout()
+plt.show()
+ 
 #%% e. Ionosphere Correction
 # Calcualte the TEC:
 beta = (1/40.3) * (freqs_all[0]**2 * freqs_all[1] **2)/(freqs_all[1]**2 - freqs_all[0]**2)
@@ -433,11 +488,11 @@ L2_phase_adv_dir = -(40.3*STEC_dir)/(freqs_all[1]**2)
 L1_phase_adv_ref = -(40.3*STEC_ref)/(freqs_all[0]**2)
 L2_phase_adv_ref = -(40.3*STEC_ref)/(freqs_all[1]**2)
 # Correct the phase values using the phase advance:
-L1_phase_cor_d = ##prior phase estimate## + L1_phase_adv_dir # Note these are added since the arrays are negative
-L2_phase_cor_d = ##prior phase estimate## + L2_phase_adv_dir ##
+L1_phase_cor_d = L1_phase_est_d + L1_phase_adv_dir # Note these are added since the arrays are negative
+L2_phase_cor_d = L2_phase_est_d + L2_phase_adv_dir ##
 
-L1_phase_cor_r = ##prior phase estimate## + L1_phase_adv_ref ###
-L2_phase_cor_r = ##prior phase estimate## + L2_phase_adv_ref ####
+L1_phase_cor_r = L1_phase_cyc_r + L1_phase_adv_ref ###
+L2_phase_cor_r = L2_phase_cyc_r + L2_phase_adv_ref ####
 # Make plots of the delay and corrections:
 fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(2,2,figsize=(15,8))
 ax1.set_title("Direct Signal Ionospheric Correction")
@@ -481,3 +536,22 @@ plt.show()
 
 #%% f. Sea surface height anomaly (SSHA) retrieval
 # subtract the direct signal excess phase from the reflected signal excess phase
+L1_phase_adv_dir -= L1_phase_adv_dir[0]
+L2_phase_adv_dir -= L2_phase_adv_dir[0]
+
+L1_phase_cor_r -= L1_phase_cor_r[0]
+L2_phase_cor_r -= L2_phase_cor_r[0]
+
+L1_SSHA = (L1_phase_adv_dir - L1_phase_cor_r) * np.sin(np.radians(sp_el[7550:15100]))
+L2_SSHA = (L2_phase_adv_dir - L2_phase_cor_r) * np.sin(np.radians(sp_el[7550:15100]))
+
+# Plot the results:
+plt.figure(figsize=(8,5))
+plt.title("Sea Surface Height Anomaly")
+plt.plot(L1_SSHA,c='dodgerblue',label='L1')
+plt.plot(L2_SSHA,c='tomato',label='L2')
+plt.xticks(np.linspace(0,len(L1_dir_unwrap),6),np.linspace(150,300,6).astype(int))
+plt.xlabel("Time (s)")
+plt.ylabel("SSHA (m)")
+plt.grid()
+plt.legend()
