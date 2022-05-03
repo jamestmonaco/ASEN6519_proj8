@@ -421,6 +421,9 @@ tropo_delay = tropo_out['Tropo_Delay_az'][0][7550:15100]
 L1_phase_trop_r = L1_phase_est_r - 2*tropo_delay
 L2_phase_trop_r = L2_phase_est_r - 2*tropo_delay
 
+L1_phase_trop_r -= L1_phase_trop_r[0]
+L2_phase_trop_r -= L2_phase_trop_r[0]
+
 # Plotting the correction and corrected phase:
 fig, (ax1,ax2) = plt.subplots(1,2,figsize=(11,5))
 ax1.set_title("Troposphere Delay")
@@ -437,7 +440,6 @@ ax2.set_xlabel("Time (s)")
 ax2.set_ylabel("Phase (m)")
 ax2.grid()
 ax2.legend()
-ax2.axvline(6200,c='black',linewidth=1)
 
 fig.tight_layout()
 plt.show()
@@ -450,6 +452,8 @@ L2_phase_cyc_r[6200:] += lambda_L2
 
 L1_phase_trop_r = L1_phase_est_r - 2*tropo_delay
 L2_phase_trop_r = L2_phase_est_r - 2*tropo_delay
+L1_phase_trop_r -= L1_phase_trop_r[0]
+L2_phase_trop_r -= L2_phase_trop_r[0]
 
 # Plot the comparison:
 fig,(ax1,ax2) = plt.subplots(1,2,figsize=(11,5))
