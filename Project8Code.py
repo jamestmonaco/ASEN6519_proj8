@@ -445,17 +445,28 @@ fig.tight_layout()
 plt.show()
 
 #%% d. Check cycle slips and make corrections if needed 
+
+# correcting cycle slips
 L1_phase_cyc_r = L1_phase_trop_r
-L1_phase_cyc_r[6196:] += lambda_L1/2
-L1_phase_cyc_r[6202:] += lambda_L1/2
-L1_phase_cyc_r[6877:] += lambda_L1/2
 L2_phase_cyc_r = L2_phase_trop_r
-L2_phase_cyc_r[7047:] -= lambda_L2
+
+L1_diffs= np.argsort(abs(np.diff(L1_phase_cyc_r)))
+L2_diffs= np.argsort(abs(np.diff(L2_phase_cyc_r)))
+L2_phase_cyc_r[L2_diffs[-1]:] -= lambda_L1
+
+L1_phase_cyc_r[L1_diffs[-1]:] += lambda_L1
+L1_phase_cyc_r[L1_diffs[-6]:] += lambda_L1 * 1.5
+L1_phase_cyc_r[L1_diffs[-23]-17:] -= lambda_L1 
+L1_phase_cyc_r[L1_diffs[-23]-110:] += lambda_L1 *2
+L1_phase_cyc_r[L1_diffs[-3]-200:] += lambda_L1
 
 L1_phase_trop_r = L1_phase_est_r - 2*tropo_delay
 L2_phase_trop_r = L2_phase_est_r - 2*tropo_delay
 L1_phase_trop_r -= L1_phase_trop_r[0]
 L2_phase_trop_r -= L2_phase_trop_r[0]
+
+
+
 
 # Plot the comparison:
 fig,(ax1,ax2) = plt.subplots(1,2,figsize=(11,5))
@@ -561,6 +572,7 @@ L1_SSHA = L1_dphi / 2 / np.sin(np.radians(sp_el[7550:15100]))
 L2_SSHA = L2_dphi / 2 / np.sin(np.radians(sp_el[7550:15100]))
 L1_SSHA -= L1_SSHA[0]
 L2_SSHA -= L2_SSHA[0]
+
 
 # Plot the results:
 plt.figure(figsize=(8,5))
