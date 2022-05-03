@@ -446,7 +446,8 @@ plt.show()
 
 #%% d. Check cycle slips and make corrections if needed 
 L1_phase_cyc_r = L1_phase_trop_r
-L1_phase_cyc_r[6202:] += lambda_L1
+L1_phase_cyc_r[6196:] += lambda_L1/2
+L1_phase_cyc_r[6202:] += lambda_L1/2
 L1_phase_cyc_r[6877:] += lambda_L1/2
 L2_phase_cyc_r = L2_phase_trop_r
 L2_phase_cyc_r[7047:] -= lambda_L2
@@ -459,7 +460,7 @@ L2_phase_trop_r -= L2_phase_trop_r[0]
 # Plot the comparison:
 fig,(ax1,ax2) = plt.subplots(1,2,figsize=(11,5))
 ax1.set_title("L1 Phase Estimate")
-#ax1.plot(L1_phase_trop_r,c='navy',label='Before Correction')
+ax1.plot(L1_phase_trop_r,c='navy',label='Before Correction')
 ax1.plot(L1_phase_cyc_r,c='dodgerblue',label='After Correction',alpha=0.75)
 ax1.set_xticks(np.linspace(0,len(L1_dir_unwrap),6),np.linspace(150,300,6).astype(int))
 ax1.set_xlabel("Time (s)")
@@ -468,7 +469,7 @@ ax1.grid()
 ax1.legend()
 
 ax2.set_title("L2 Phase Estimate")
-#ax2.plot(L2_phase_trop_r,c='chocolate',label='Before Correction')
+ax2.plot(L2_phase_trop_r,c='chocolate',label='Before Correction')
 ax2.plot(L2_phase_cyc_r,c='tomato',label='After Correction',alpha=0.75)
 ax2.set_xticks(np.linspace(0,len(L1_dir_unwrap),6),np.linspace(150,300,6).astype(int))
 ax2.set_xlabel("Time (s)")
@@ -558,6 +559,8 @@ L2_dphi -= np.mean(L2_dphi)
 
 L1_SSHA = L1_dphi / 2 / np.sin(np.radians(sp_el[7550:15100]))
 L2_SSHA = L2_dphi / 2 / np.sin(np.radians(sp_el[7550:15100]))
+L1_SSHA -= L1_SSHA[0]
+L2_SSHA -= L2_SSHA[0]
 
 # Plot the results:
 plt.figure(figsize=(8,5))
