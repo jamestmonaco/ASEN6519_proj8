@@ -412,7 +412,9 @@ tropo_in_dict = {"GPSweek": gps_wk[0][0],
                  "lat": sp_lat, "long": sp_lon, 
                  "height": sp_mss, 
                  "el": sp_el, "az": sp_az}
-sci.savemat("tropo_in.mat", tropo_in_dict,)
+sci.savemat("tropo_in.mat", tropo_in_dict)
+
+tropo_out = sci.loadmat("tropo_out.mat")
 
 #%% d. Check cycle slips and make corrections if needed 
 
