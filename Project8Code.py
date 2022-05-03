@@ -493,10 +493,15 @@ L1_phase_adv_ref = -(40.3*STEC_ref)/(freqs_all[0]**2)
 L2_phase_adv_ref = -(40.3*STEC_ref)/(freqs_all[1]**2)
 # Correct the phase values using the phase advance:
 L1_phase_cor_d = L1_phase_est_d + L1_phase_adv_dir # Note these are added since the arrays are negative
+L1_phase_cor_d -= L1_phase_cor_d[0]
 L2_phase_cor_d = L2_phase_est_d + L2_phase_adv_dir ##
+L2_phase_cor_d -= L2_phase_cor_d[0]
 
 L1_phase_cor_r = L1_phase_cyc_r + L1_phase_adv_ref ###
+L1_phase_cor_r -= L1_phase_cor_r[0]
 L2_phase_cor_r = L2_phase_cyc_r + L2_phase_adv_ref ####
+L2_phase_cor_r -= L2_phase_cor_r[0]
+
 # Make plots of the delay and corrections:
 fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(2,2,figsize=(15,8))
 ax1.set_title("Direct Signal Ionospheric Correction")
@@ -546,8 +551,11 @@ L2_phase_adv_dir -= L2_phase_adv_dir[0]
 L1_phase_cor_r -= L1_phase_cor_r[0]
 L2_phase_cor_r -= L2_phase_cor_r[0]
 
-L1_SSHA = (L1_phase_adv_dir - L1_phase_cor_r) * np.sin(np.radians(sp_el[7550:15100]))
-L2_SSHA = (L2_phase_adv_dir - L2_phase_cor_r) * np.sin(np.radians(sp_el[7550:15100]))
+L1_SSHA = (L1_phase_adv_dir - L1_phase_cor_r) / 2 / np.sin(np.radians(sp_el[7550:15100]))
+L2_SSHA = (L2_phase_adv_dir - L2_phase_cor_r) / 2 / np.sin(np.radians(sp_el[7550:15100]))
+
+L1_SSHA -= np.mean(L1_SSHA)
+L2_SSHA -= np.mean(L2_SSHA)
 
 # Plot the results:
 plt.figure(figsize=(8,5))
