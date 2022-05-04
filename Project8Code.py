@@ -577,14 +577,14 @@ L2_phase_cor_r -= L2_phase_cor_r[0]
 L1_dphi = (L1_phase_adv_dir - L1_phase_cor_r)
 L2_dphi = (L2_phase_adv_dir - L2_phase_cor_r)
 
-L1_dphi -= np.mean(L1_dphi)
-L2_dphi -= np.mean(L2_dphi)
+L1_dphi += np.mean(L1_dphi)
+L2_dphi += np.mean(L2_dphi)
 
 L1_SSHA = L1_dphi / 2 / np.sin(np.radians(sp_el[7550:15100]))
 L2_SSHA = L2_dphi / 2 / np.sin(np.radians(sp_el[7550:15100]))
+
 L1_SSHA -= L1_SSHA[0]
 L2_SSHA -= L2_SSHA[0]
-
 
 # Plot the results:
 plt.figure(figsize=(8,5))
